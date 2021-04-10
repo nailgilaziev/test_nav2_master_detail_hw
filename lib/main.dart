@@ -22,7 +22,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-GlobalKey itemPanelKey = GlobalKey(debugLabel: 'itemPanelKey');
+final itemPanelKey = GlobalKey(debugLabel: 'itemPanelKey');
+final navigatorKey = GlobalKey<NavigatorState>(debugLabel: 'navigatorKey');
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -31,9 +32,24 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-final navigatorKey = GlobalKey<NavigatorState>(debugLabel: 'navigatorKey');
-
 class _MyHomePageState extends State<MyHomePage> {
+  late ProviderSubscription<void> sub;
+
+  @override
+  void initState() {
+    sub = ProviderScope.containerOf(context, listen: false)
+        .listen(selectedStateProvider, mayHaveChanged: (r) {
+      setState(() {}); // rebuild navigator pages
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    sub.close();
+    super.dispose();
+  }
+
   bool twoPanelMode = true;
 
   void switchMode() {
@@ -43,7 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> getPages() {
-    final showDetails = context.read(selectedStateProvider).state != null;
+    final id = context.read(selectedStateProvider).state;
+    final showDetails = id != null;
     final pages = [
       MasterList(),
       if (showDetails) DetailEditorHW(key: itemPanelKey),
@@ -94,27 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
       return true;
     } else {
-      print(
-          'route.didPop() returned false. It means that it has internal stack');
-      // I don't understand when it can happen and what true / false here means
-      return false;
+      print('route.didPop() false. It means that it has internal stack');
+      return false; // or return true? when it happens? what the case?
     }
-  }
-
-  late ProviderSubscription<void> sub;
-
-  @override
-  void initState() {
-    sub = ProviderScope.containerOf(context, listen: false)
-        .listen(selectedStateProvider, mayHaveChanged: (r) {
-      setState(() {}); // rebuild
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    sub.close();
-    super.dispose();
   }
 }
