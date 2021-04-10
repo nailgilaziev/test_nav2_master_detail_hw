@@ -1,0 +1,24 @@
+include: package:lint/analysis_options.yaml # https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+  language:
+    strict-inference: true # https://github.com/dart-lang/language/blob/master/resources/type-system/strict-inference.md
+    strict-raw-types: true # https://github.com/dart-lang/language/blob/master/resources/type-system/strict-raw-types.md
+  errors:
+    missing_required_param: error
+    parameter_assignments: error
+    missing_return: error
+    always_use_package_imports: error
+linter:
+  rules:
+    # for some reason enabling it doesn't make any difference
+    always-specify-types: true # https://dart-lang.github.io/linter/lints/always_specify_types.html
+    always_use_package_imports: true # https://dart-lang.github.io/linter/lints/always_use_package_imports.html
+    prefer_single_quotes: true
+
